@@ -9,4 +9,5 @@
     <string name="login.button.register">Rgister</string>
     <string name="login.hint.name">Name</string>
     <string name="forgot_text">Forgot Password</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
