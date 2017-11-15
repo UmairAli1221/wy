@@ -39,7 +39,7 @@ public class ForgotActivity extends AppCompatActivity {
 
 
         //Toolabr BackArrow
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+//        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //ResetButton
         resetPassword.setOnClickListener(new View.OnClickListener() {

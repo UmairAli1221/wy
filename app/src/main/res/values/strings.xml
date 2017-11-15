@@ -6,8 +6,11 @@
     <string name="login.hint.email">Email</string>
     <string name="login.hint.password">Password</string>
     <string name="login.button.forgot">Forgot Password?</string>
-    <string name="login.button.register">Rgister</string>
+    <string name="login.button.register">Register</string>
     <string name="login.hint.name">Name</string>
     <string name="forgot_text">Forgot Password</string>
     <string name="title_activity_maps">Map</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

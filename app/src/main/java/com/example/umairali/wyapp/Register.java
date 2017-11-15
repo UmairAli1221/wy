@@ -44,7 +44,7 @@ public class Register extends AppCompatActivity {
         mregisterButton=(Button)findViewById(R.id.RegistrationButton);
 
         //Toolabr BackArrow
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+      //  getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //Progress Dialoge
         mprogressDialog = new ProgressDialog(this);
