@@ -1,27 +1,16 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="wrap_content"
-    android:layout_height="wrap_content"
+    android:layout_height="match_parent"
     android:orientation="vertical"
 
     tools:context="com.example.umairali.wyapp.MainActivity">
 
-    <LinearLayout
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content">
-
-        <EditText
-            android:id="@+id/searchEdit"
-            android:layout_width="220dp"
-            android:layout_height="wrap_content"
-            android:hint="Search.." />
-
-        <Button
-            android:id="@+id/searchbtn"
-            android:layout_width="80dp"
-            android:layout_height="wrap_content"
-            android:text="Search" />
-    </LinearLayout>
+    <fragment android:id="@+id/place_autocomplete_fragment"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:name="com.google.android.gms.location.places.ui.PlaceAutocompleteFragment"
+        xmlns:android="http://schemas.android.com/apk/res/android" />
 
 
     <fragment xmlns:android="http://schemas.android.com/apk/res/android"
@@ -29,8 +18,8 @@
         android:id="@+id/map"
         android:name="com.google.android.gms.maps.SupportMapFragment"
         android:layout_width="387dp"
-        android:layout_height="464dp"
-        tools:context="com.example.umairali.wyapp.MapsActivity"
+        android:layout_height="match_parent"
+        tools:context="com.example.umairali.wyapp.MapFragment"
         tools:layout_editor_absoluteX="8dp"
         tools:layout_editor_absoluteY="8dp" />
 </LinearLayout>

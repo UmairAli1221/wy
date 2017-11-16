@@ -1,81 +1,125 @@
 package com.example.umairali.wyapp;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
-import android.support.v4.app.FragmentActivity;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
+import android.text.Html;
+import android.text.TextUtils;
+import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+
+import com.google.android.gms.common.api.Status;
+import android.location.LocationListener;
 import android.widget.Toast;
 
+import com.google.android.gms.location.places.AutocompleteFilter;
+import com.google.android.gms.location.places.GeoDataApi;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.SupportPlaceAutocompleteFragment;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.Locale;
 
-public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
+import static android.content.ContentValues.TAG;
+
+public class MapsActivity extends android.support.v4.app.Fragment implements OnMapReadyCallback {
 
     private GoogleMap mMap;
     private DatabaseReference mUserRef;
     private FirebaseAuth mAuth;
     private EditText mSearchEditText;
     private Button mButton;
+    private SupportMapFragment map;
+    private LocationManager locationManager;
+    private static final String LOG_TAG = "PlaceSelectionListener";
+    private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
+            new LatLng(37.398160, -122.180831), new LatLng(37.430610, -121.972090));
+    public static Fragment newInstance() {
+        return new MapsActivity();
+    }
+    private GeoDataApi mGeoDataClient;
 
 
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_maps);
+        View v = inflater.inflate(R.layout.activity_maps, container, false);
+        Bundle bdl = getArguments();
 
-        //Toolabr BackArrow
-        //getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        // Obtain the SupportMapFragment and get notified when the map is ready to be used.
-        SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
-                .findFragmentById(R.id.map);
-        mapFragment.getMapAsync(this);
-        mAuth=FirebaseAuth.getInstance();
-        mSearchEditText=(EditText)findViewById(R.id.searchEdit);
-        mButton=(Button)findViewById(R.id.searchbtn);
 
-        mButton.setOnClickListener(new View.OnClickListener() {
+        FragmentManager manager = getFragmentManager();
+        FragmentTransaction transaction = manager.beginTransaction();
+        SupportMapFragment fragment = new SupportMapFragment();
+        transaction.add(R.id.map, fragment);
+        transaction.commit();
+
+        fragment.getMapAsync(this);
+        mAuth = FirebaseAuth.getInstance();
+
+     /*   mButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Search();
             }
+        });*/
+        // Method #1
+        PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
+                .setTypeFilter(AutocompleteFilter.TYPE_FILTER_ADDRESS)
+                .build();
+        autocompleteFragment.setFilter(typeFilter);
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                LatLng location=place.getLatLng();
+                String locationName=place.getName().toString();
+                Search(location,locationName);
+            }
+
+            @Override
+            public void onError(Status status) {
+                // TODO: Handle the error.
+            }
         });
+        autocompleteFragment.setHint("Search a Location");
+        return v;
+    }
+
+    private void Search(LatLng location, String locationName) {
+
+
+                mMap.addMarker(new MarkerOptions().position(location).title(locationName));
+                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 15));
 
     }
 
-    private void Search() {
-        String location=mSearchEditText.getText().toString();
-        List<Address> addressList=null;
-            Geocoder geocoder=new Geocoder(MapsActivity.this, Locale.getDefault());
-            try {
-                addressList=geocoder.getFromLocationName(location,1);
-                if (addressList != null && addressList.size() > 0) {
-                    Address address=(Address)addressList.get(0);
-                    LatLng latLng=new LatLng(address.getLatitude(),address.getLongitude());
-                    mMap.addMarker(new MarkerOptions().position(latLng).title("Where Are You"));
-                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng,15));
-                }
-
-            } catch (IOException e) {
-                e.printStackTrace();
-        }
-    }
-
-    protected void onStart() {
+    public void onStart() {
         super.onStart();
         FirebaseUser mUser = mAuth.getCurrentUser();
         if (mUser == null) {
@@ -98,23 +142,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             public void onMapClick(LatLng point) {
                 // TODO Auto-generated method stub
                 mMap.clear();
-                mMap.addMarker(new MarkerOptions().position(point).title("You Are Here"));
-                mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point,15));
+                double lat=point.latitude;
+                double log=point.longitude;
+                Geocoder geocoder = new Geocoder(getContext(), Locale.getDefault());
+                List<Address> addresses = null;
+                try {
+                    addresses = geocoder.getFromLocation(lat,log, 1);
+                    String cityName = addresses.get(0).getAddressLine(0);
+                    String stateName = addresses.get(0).getAddressLine(1);
+                    String countryName = addresses.get(0).getAddressLine(2);
+                    mMap.addMarker(new MarkerOptions().position(point).title(cityName+" "+stateName+" "+countryName));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(point, 15));
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
 
             }
         });
 
     }
+
     private void sendToStart() {
-        Intent startIntent = new Intent(MapsActivity.this, LoginActivity.class);
+        Intent startIntent = new Intent(getContext(), LoginActivity.class);
         startIntent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_NEW_TASK);
         startActivity(startIntent);
-        finish();
 
     }
 
     @Override
-    protected void onStop() {
+    public void onStop() {
         super.onStop();
 
         FirebaseUser currentUser = mAuth.getCurrentUser();

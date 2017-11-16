@@ -26,6 +26,9 @@ class SectionPagerAdapter extends FragmentPagerAdapter {
             case 2:
                 Contacts contacts = new Contacts();
                 return contacts;
+            case 3:
+                MapsActivity mapsActivity = new MapsActivity();
+                return mapsActivity;
             default:
                 return null;
         }
@@ -34,7 +37,7 @@ class SectionPagerAdapter extends FragmentPagerAdapter {
 
     @Override
     public int getCount() {
-        return 3;
+        return 4;
     }
 
     @Override
@@ -47,6 +50,8 @@ class SectionPagerAdapter extends FragmentPagerAdapter {
                 return "Groups";
             case 2:
                 return "Contacts";
+            case 3:
+                return "Map";
             default:
                 return null;
         }
