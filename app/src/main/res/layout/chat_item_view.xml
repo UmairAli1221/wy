@@ -1,0 +1,98 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:emojicon="http://schemas.android.com/tools"
+    android:orientation="vertical"
+    android:layout_width="fill_parent"
+    android:layout_height="wrap_content"
+    android:background="@drawable/blogs_list_row_selector"
+    android:padding="10dp">
+
+    <!-- Thumbnail Image -->
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/leftItem">
+
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:gravity="bottom"
+            android:focusableInTouchMode="false" >
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:id="@+id/left_fromUser"
+                android:src="@drawable/default_avatar"
+                android:minHeight="16dp"
+                android:minWidth="16dp"
+                android:layout_marginRight="10dp" />
+
+            <LinearLayout
+                android:orientation="horizontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_weight="1">
+
+                <LinearLayout
+                    android:orientation="vertical"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1">
+
+                    <com.example.umairali.wyapp.ResizableImageView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:id="@+id/left_img"
+                        android:src="@drawable/img_loading"
+                        android:adjustViewBounds="true"
+                        android:maxHeight="480dp" />
+
+                    <hani.momanii.supernova_emoji_library.Helper.EmojiconTextView
+                        android:id="@+id/left_message"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:singleLine="false"
+                        android:textSize="16dp"
+                        emojicon:emojiconSize="24dp"
+                        android:textStyle="normal"
+                        android:textColor="#2B3135"
+                        android:background="@drawable/chat_left_item"
+                        android:text="Example message"
+                        android:layout_marginTop="3dp" />
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/divider"
+                    android:layout_weight="0" />
+
+            </LinearLayout>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:paddingLeft="52dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="4m ago"
+                android:id="@+id/left_timeAgo"
+                android:layout_marginTop="5dp"
+                android:textColor="@color/gray_text"
+                android:fontFamily="sans-serif-light"
+                android:textSize="14dp"
+                android:singleLine="true" />
+        </LinearLayout>
+    </LinearLayout>
+
+
+</LinearLayout>

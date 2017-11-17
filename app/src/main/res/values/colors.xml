@@ -4,4 +4,9 @@
     <color name="colorPrimaryDark">#B3E5FC</color>
     <color name="colorAccent">#FF80AB</color>
     <color name="colorWhite">#ffffff</color>
+    <color name="gray_border">#D3D3D3</color>
+    <color name="white">#ffffff</color>
+    <color name="gray_text">#757575</color>
+    <color name="item_row_start_color">#ffffff</color>
+    <color name="item_row_end_color">#ffffff</color>
 </resources>

@@ -103,10 +103,10 @@ public class Contacts extends Fragment {
                                                 startActivity(chatIntent);
                                             }
                                             if (which == 1) {
-                                               /* Intent chatIntent = new Intent(getContext(), ChatActivity.class);
+                                               Intent chatIntent = new Intent(getContext(), ChatActivity.class);
                                                 chatIntent.putExtra("user_id", user_id);
                                                 chatIntent.putExtra("user_name", userName);
-                                                startActivity(chatIntent);*/
+                                                startActivity(chatIntent);
                                             }
                                         }
                                     });

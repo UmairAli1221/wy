@@ -56,6 +56,7 @@ public class MapsActivity extends android.support.v4.app.Fragment implements OnM
     private EditText mSearchEditText;
     private Button mButton;
     private SupportMapFragment map;
+    private View v;
     private LocationManager locationManager;
     private static final String LOG_TAG = "PlaceSelectionListener";
     private static final LatLngBounds BOUNDS_MOUNTAIN_VIEW = new LatLngBounds(
@@ -69,7 +70,7 @@ public class MapsActivity extends android.support.v4.app.Fragment implements OnM
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        View v = inflater.inflate(R.layout.activity_maps, container, false);
+        v = inflater.inflate(R.layout.activity_maps, container, false);
         Bundle bdl = getArguments();
 
 
@@ -82,12 +83,6 @@ public class MapsActivity extends android.support.v4.app.Fragment implements OnM
         fragment.getMapAsync(this);
         mAuth = FirebaseAuth.getInstance();
 
-     /*   mButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Search();
-            }
-        });*/
         // Method #1
         PlaceAutocompleteFragment autocompleteFragment = (PlaceAutocompleteFragment) getActivity().getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
         AutocompleteFilter typeFilter = new AutocompleteFilter.Builder()
@@ -108,6 +103,7 @@ public class MapsActivity extends android.support.v4.app.Fragment implements OnM
             }
         });
         autocompleteFragment.setHint("Search a Location");
+
         return v;
     }
 
