@@ -7,14 +7,13 @@ import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.net.Uri;
-import android.os.Bundle;
 import android.os.Environment;
 import android.provider.MediaStore;
-import android.support.annotation.NonNull;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
+import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -29,11 +28,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.ChildEventListener;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,7 +40,6 @@ import com.google.firebase.database.ServerValue;
 import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -58,7 +53,9 @@ import de.hdodenhof.circleimageview.CircleImageView;
 import hani.momanii.supernova_emoji_library.Actions.EmojIconActions;
 import hani.momanii.supernova_emoji_library.Helper.EmojiconEditText;
 
-public class ChatActivity extends AppCompatActivity {
+import static com.example.umairali.wyapp.R.id.messageText;
+
+public class GroupChatActivity extends AppCompatActivity {
 
     private String mChatUser;
     private Toolbar mChatToolbar;
@@ -75,13 +72,12 @@ public class ChatActivity extends AppCompatActivity {
     private ProgressDialog mprogressDialog;
     private EmojIconActions emojIcon;
     private SwipeRefreshLayout mRefreshLayout;
-    private DatabaseReference mNotificationDatabase;
 
     private RecyclerView mMessagesList;
 
     private final List<Messages> messagesList = new ArrayList<>();
     private LinearLayoutManager mLinearLayout;
-    private MessageAdapter mAdapter;
+    private MessageAdapter2 mAdapter;
     private DatabaseReference mUserRef;
     private FirebaseAuth mAuth;
     private static final int TOTAL_ITEMS_TO_LOAD = 10;
@@ -100,13 +96,13 @@ public class ChatActivity extends AppCompatActivity {
     private String mPrevKey = "";
     private StorageReference imageStorage;
     LinearLayout mContainerImg;
-
+    private String userName;
+    private DatabaseReference mNotificationDatabase,mMembersDatabase,mBlockmembers;
     ImageView mSendMessage, mAddImg, mEmojiBtn, mDeleteImg, mPreviewImg;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chat);
+        setContentView(R.layout.activity_group_chat);
 
         mChatToolbar = (Toolbar) findViewById(R.id.chat_app_bar);
         setSupportActionBar(mChatToolbar);
@@ -121,13 +117,16 @@ public class ChatActivity extends AppCompatActivity {
         mAuth = FirebaseAuth.getInstance();
         mCurrentUserId = mAuth.getCurrentUser().getUid();
 
-        mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
-        mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications");
+        mChatUser = getIntent().getStringExtra("user_id");
+        userName= getIntent().getStringExtra("Group_Name");
+
+        mNotificationDatabase=FirebaseDatabase.getInstance().getReference().child("GroupNotifications");
+        mMembersDatabase = FirebaseDatabase.getInstance().getReference().child("Group_Metadata").child(mChatUser).child("group_members");
+        mMembersDatabase.keepSynced(true);
+        mBlockmembers = FirebaseDatabase.getInstance().getReference().child("Group_Metadata").child(mChatUser).child("block_members");
+        mBlockmembers.keepSynced(true);
         imageStorage = FirebaseStorage.getInstance().getReference();
 
-
-        mChatUser = getIntent().getStringExtra("user_id");
-        final String userName = getIntent().getStringExtra("user_name");
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View action_bar_view = inflater.inflate(R.layout.chat_custom_bar, null);
@@ -154,7 +153,7 @@ public class ChatActivity extends AppCompatActivity {
 
         rootView = findViewById(R.id.root_view);
         mSendMessage = (ImageView) findViewById(R.id.sendMessage);
-        mChatMessageView = (EmojiconEditText) findViewById(R.id.messageText);
+        mChatMessageView = (EmojiconEditText) findViewById(messageText);
         emojIcon = new EmojIconActions(this, rootView, mChatMessageView, mEmojiBtn);
         emojIcon.ShowEmojIcon();
         emojIcon.setIconsIds(R.drawable.ic_action_keyboard, R.drawable.smiley);
@@ -182,8 +181,6 @@ public class ChatActivity extends AppCompatActivity {
             public void onKeyboardClose() {
             }
         });
-
-
         mDeleteImg.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -221,7 +218,7 @@ public class ChatActivity extends AppCompatActivity {
 
         loadMessages();
 
-        mAdapter = new MessageAdapter(messagesList);
+        mAdapter = new MessageAdapter2(messagesList);
 
         mMessagesList = (RecyclerView) findViewById(R.id.listView);
         mLinearLayout = new LinearLayoutManager(this);
@@ -234,45 +231,38 @@ public class ChatActivity extends AppCompatActivity {
 
 
         mTitleView.setText(userName);
-        mRootRef.child("Users").child(mChatUser).addValueEventListener(new ValueEventListener() {
+        mRootRef.child("Group_Metadata").child(mChatUser).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
+                String groupName = dataSnapshot.child("Group_Name").getValue().toString();
+                mTitleView.setText(groupName);
+                String groupImage = dataSnapshot.child("Group_image").getValue().toString();
+                Picasso.with(GroupChatActivity.this).load(groupImage)
+                        .placeholder(R.drawable.default_avatar).into(mProfileImage, new Callback() {
+                    @Override
+                    public void onSuccess() {
 
-                String online = dataSnapshot.child("online").getValue().toString();
-                String image = dataSnapshot.child("profile_image").getValue().toString();
-                // String name=dataSnapshot.child("name").getValue().toString();
-                // mTitleView.setText(name);
+                    }
 
-                if (online.equals("true")) {
+                    @Override
+                    public void onError() {
+                        Picasso.with(mProfileImage.getContext()).load(R.drawable.default_avatar).into(mProfileImage);
+                    }
+                });
 
-                    mLastSeenView.setText("Online");
+                String groupAdmin = dataSnapshot.child("CreatedBy_UserID").getValue().toString();
+                mRootRef.child("Users").child(groupAdmin).addValueEventListener(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(DataSnapshot dataSnapshot) {
+                        String admin_name = dataSnapshot.child("name").getValue().toString();
+                        mLastSeenView.setText("Created By " + admin_name);
+                    }
 
+                    @Override
+                    public void onCancelled(DatabaseError databaseError) {
 
-                } else {
-
-                    //---------------User Last Online Status---------//
-                    GetTimeAgo getTimeAgo = new GetTimeAgo();
-
-                    long lastTime = Long.parseLong(online);
-
-                    String lastSeenTime = getTimeAgo.getTimeAgo(lastTime, getApplicationContext());
-
-                    mLastSeenView.setText(lastSeenTime);
-                    Picasso.with(ChatActivity.this).load(image)
-                            .placeholder(R.drawable.default_avatar).into(mProfileImage, new Callback() {
-                        @Override
-                        public void onSuccess() {
-
-                        }
-
-                        @Override
-                        public void onError() {
-                            Picasso.with(mProfileImage.getContext()).load(R.drawable.default_avatar).into(mProfileImage);
-                        }
-                    });
-
-                }
-
+                    }
+                });
             }
 
             @Override
@@ -282,25 +272,15 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    protected void onStart() {
-        super.onStart();
-
-
-        mUserRef.child("online").setValue("true");
-
-
-    }
-
-
     private void SelectImage() {
         final CharSequence[] options = {"Take Photo", "Choose from Gallery", "Cancel"};
 
-        AlertDialog.Builder builder = new AlertDialog.Builder(ChatActivity.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(GroupChatActivity.this);
         builder.setTitle("Add Photo!");
         builder.setItems(options, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int item) {
-                boolean result = Utility.checkPermission(ChatActivity.this);
+                boolean result = Utility.checkPermission(GroupChatActivity.this);
                 if (options[item].equals("Take Photo")) {
                     if (true) {
                         try {
@@ -314,7 +294,7 @@ public class ChatActivity extends AppCompatActivity {
                         } catch (ActivityNotFoundException anfe) {
                             //display an error message
                             String errorMessage = "Whoops - your device doesn't support capturing images!";
-                            Toast.makeText(ChatActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
+                            Toast.makeText(GroupChatActivity.this, errorMessage, Toast.LENGTH_SHORT).show();
                         }
                     }
                 } else if (options[item].equals("Choose from Gallery")) {
@@ -390,77 +370,34 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-
     private void loadMoreMessages() {
-        DatabaseReference messageRef = mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("messages");
+        DatabaseReference messageRef = mRootRef.child("Group_Metadata").child(mChatUser).child("messages");
         Query messageQuery = messageRef.orderByKey().endAt(mLastKey).limitToLast(10);
+
         messageQuery.addChildEventListener(new ChildEventListener() {
             @Override
             public void onChildAdded(DataSnapshot dataSnapshot, String s) {
+
                 Messages message = dataSnapshot.getValue(Messages.class);
 
-                String messageKey = dataSnapshot.getKey();
-                if (!mPrevKey.equals(messageKey)) {
-                    messagesList.add(itemPos++, message);
-                } else {
-                    mPrevKey = mLastKey;
+
+                String messageKey=dataSnapshot.getKey();
+                if (!mPrevKey.equals(messageKey)){
+                    messagesList.add(itemPos++,message);
+                }else {
+                    mPrevKey=mLastKey;
                 }
 
-                if (itemPos == 1) {
+                if (itemPos==1){
 
-                    mLastKey = messageKey;
+                    mLastKey=messageKey;
                 }
 
 
                 mAdapter.notifyDataSetChanged();
                 // mMessagesList.scrollToPosition(messagesList.size() - 1);
                 mRefreshLayout.setRefreshing(false);
-                mLinearLayout.scrollToPositionWithOffset(10, 0);
-            }
-
-            @Override
-            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onChildRemoved(DataSnapshot dataSnapshot) {
-
-            }
-
-            @Override
-            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-
-            }
-        });
-
-    }
-
-    private void loadMessages() {
-
-        DatabaseReference messageRef = mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("messages");
-        Query messageQuery = messageRef.limitToLast(mCurrentPage * TOTAL_ITEMS_TO_LOAD);
-
-        messageQuery.addChildEventListener(new ChildEventListener() {
-            @Override
-            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
-
-                Messages message = dataSnapshot.getValue(Messages.class);
-                itemPos++;
-                if (itemPos == 1) {
-                    String messageKey = dataSnapshot.getKey();
-                    mLastKey = messageKey;
-                    mPrevKey = messageKey;
-                }
-                messagesList.add(message);
-                mAdapter.notifyDataSetChanged();
-                mMessagesList.scrollToPosition(messagesList.size() - 1);
-                mRefreshLayout.setRefreshing(false);
+                mLinearLayout.scrollToPositionWithOffset(10,0);
 
             }
 
@@ -488,99 +425,27 @@ public class ChatActivity extends AppCompatActivity {
     }
 
     private void sendMessage() {
-
-        mprogressDialog.show();
-        mChatMessageView = (EmojiconEditText) findViewById(R.id.messageText);
-
         final String message = mChatMessageView.getText().toString();
-        mChatMessageView.clearFocus();
 
-        final String current_user_ref = "Chat/" + mCurrentUserId + "/" + mChatUser + "/messages";
-        final String chat_user_ref = "Chat/" + mChatUser + "/" + mCurrentUserId + "/messages";
+        if (!TextUtils.isEmpty(message)) {
 
-        DatabaseReference user_message_push = mRootRef.child("Chat")
-                .child(mCurrentUserId).child(mChatUser).child("messages").push();
+            String current_user_ref = "Group_Metadata/"+ mChatUser+"/messages";
+            //String chat_user_ref = "Chat/" + mGroupId + "/" + mCurrentUserId+"/messages";
 
-        final String push_id = user_message_push.getKey();
+            DatabaseReference user_message_push = mRootRef.child("Group_Metadata").child(mChatUser).child("messages").push();
 
+            String push_id = user_message_push.getKey();
 
-        Map messageMap = new HashMap();
-
-        if (picUri != null) {
-            final StorageReference filapath = imageStorage.child("message_images").child(push_id + ".jpg");
-            filapath.putFile(picUri).addOnCompleteListener(new OnCompleteListener<UploadTask.TaskSnapshot>() {
-                @Override
-                public void onComplete(@NonNull Task<UploadTask.TaskSnapshot> task) {
-                    if (task.isSuccessful()) {
-                        filapath.getDownloadUrl().addOnSuccessListener(new OnSuccessListener<Uri>() {
-                            @Override
-                            public void onSuccess(final Uri uri) {
-                                Map messageMap = new HashMap();
-                                if (TextUtils.isEmpty(message)) {
-                                    messageMap.put("message", "default");
-                                } else {
-                                    messageMap.put("message", message);
-                                }
-                                messageMap.put("seen", false);
-                                messageMap.put("messageImage", uri.toString());
-                                messageMap.put("time", ServerValue.TIMESTAMP);
-                                messageMap.put("from", mCurrentUserId);
-
-                                Map messageUserMap = new HashMap();
-                                messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-                                messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
-
-                                mChatMessageView.setText("");
-
-                                mRootRef.updateChildren(messageUserMap, new DatabaseReference.CompletionListener() {
-                                    @Override
-                                    public void onComplete(DatabaseError databaseError, DatabaseReference databaseReference) {
-
-                                        if (databaseError != null) {
-
-                                            Log.d("CHAT_LOG", databaseError.getMessage().toString());
-                                            mprogressDialog.dismiss();
-
-                                        } else {
-                                            mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("last_message").setValue("Photo!");
-                                            mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("last_message_time").setValue(ServerValue.TIMESTAMP);
-                                            mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("last_message").setValue("Photo!");
-                                            mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("last_message_time").setValue(ServerValue.TIMESTAMP);
-                                            final Map notification = new HashMap<>();
-                                            notification.put("from", mCurrentUserId);
-                                            notification.put("type", "Single_message");
-                                            notification.put("message", "Photo!");
-                                            mNotificationDatabase.child(mChatUser).push().setValue(notification).addOnSuccessListener(new OnSuccessListener<Void>() {
-                                                @Override
-                                                public void onSuccess(Void aVoid) {
-                                                    Log.d("CHAT_LOG", "Done");
-                                                    picUri = null;
-                                                    mContainerImg.setVisibility(View.GONE);
-                                                    mprogressDialog.dismiss();
-                                                }
-                                            });
-                                        }
-
-                                    }
-                                });
-
-                            }
-                        });
-                    } else {
-                        mprogressDialog.dismiss();
-                        Toast.makeText(ChatActivity.this, "Error In Uploading Image", Toast.LENGTH_SHORT).show();
-                    }
-                }
-            });
-        } else if (!TextUtils.isEmpty(message) && picUri == null) {
+            Map messageMap = new HashMap();
             messageMap.put("message", message);
             messageMap.put("seen", false);
-            messageMap.put("messageImage", "default");
+            messageMap.put("type", "text");
             messageMap.put("time", ServerValue.TIMESTAMP);
             messageMap.put("from", mCurrentUserId);
+
             Map messageUserMap = new HashMap();
             messageUserMap.put(current_user_ref + "/" + push_id, messageMap);
-            messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
+            //messageUserMap.put(chat_user_ref + "/" + push_id, messageMap);
 
             mChatMessageView.setText("");
 
@@ -591,46 +456,91 @@ public class ChatActivity extends AppCompatActivity {
                     if (databaseError != null) {
 
                         Log.d("CHAT_LOG", databaseError.getMessage().toString());
-                        mprogressDialog.dismiss();
 
-                    } else {
-                        mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("last_message").setValue(message);
-                        mRootRef.child("Chat").child(mCurrentUserId).child(mChatUser).child("last_message_time").setValue(ServerValue.TIMESTAMP);
-                        mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("last_message").setValue(message);
-                        mRootRef.child("Chat").child(mChatUser).child(mCurrentUserId).child("last_message_time").setValue(ServerValue.TIMESTAMP);
-                        final Map notification = new HashMap<>();
-                        notification.put("from", mCurrentUserId);
-                        notification.put("type", "Single_message");
-                        notification.put("message", message);
-                        mNotificationDatabase.child(mChatUser).push().setValue(notification).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    }else {
+                        mRootRef.child("Group_Metadata").child(mChatUser).child("last_message").setValue(message);
+
+                        mRootRef.child("Group_Metadata").child(mChatUser).child("last_message_time").setValue(ServerValue.TIMESTAMP);
+                        mRootRef.child("Group_Metadata").child(mChatUser).child("group_members").addValueEventListener(new ValueEventListener() {
                             @Override
-                            public void onSuccess(Void aVoid) {
-                                Log.d("CHAT_LOG", "Done");
-                                mprogressDialog.dismiss();
+                            public void onDataChange(DataSnapshot dataSnapshot) {
+                                for (DataSnapshot childDataSnapshot : dataSnapshot.getChildren()) {
+                                    String membersKey=childDataSnapshot.getKey().toString();
+                                    if (!membersKey.equals(mCurrentUserId)){
+                                        final Map notification = new HashMap<>();
+                                        notification.put("from",mCurrentUserId );
+                                        notification.put("fromGroup",userName );
+                                        notification.put("type","Single_message");
+                                        notification.put("message", message);
+                                        mNotificationDatabase.child(membersKey).push().setValue(notification).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                            @Override
+                                            public void onSuccess(Void aVoid) {
+                                                Log.d("CHAT_LOG","Done");
+                                            }
+                                        });
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onCancelled(DatabaseError databaseError) {
+
                             }
                         });
                     }
 
                 }
             });
-        } else {
-            Toast.makeText(ChatActivity.this, "Write Something", Toast.LENGTH_SHORT).show();
-            mprogressDialog.dismiss();
+
         }
+
+
     }
 
+    private void loadMessages() {
+        DatabaseReference messageRef = mRootRef.child("Group_Metadata").child(mChatUser).child("messages");
+        Query messageQuery = messageRef.limitToLast(mCurrentPage*TOTAL_ITEMS_TO_LOAD);
 
-    @Override
-    protected void onStop() {
-        super.onStop();
+        messageQuery.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(DataSnapshot dataSnapshot, String s) {
 
-        FirebaseUser currentUser = mAuth.getCurrentUser();
+                Messages message = dataSnapshot.getValue(Messages.class);
 
-        if (currentUser != null) {
+                itemPos++;
+                if (itemPos==1){
+                    String messageKey=dataSnapshot.getKey();
+                    mLastKey=messageKey;
+                    mPrevKey=messageKey;
+                }
 
-            mUserRef.child("online").setValue(ServerValue.TIMESTAMP);
+                messagesList.add(message);
+                mAdapter.notifyDataSetChanged();
+                mMessagesList.scrollToPosition(messagesList.size() - 1);
+                mRefreshLayout.setRefreshing(false);
 
-        }
+            }
+
+            @Override
+            public void onChildChanged(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onChildRemoved(DataSnapshot dataSnapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(DataSnapshot dataSnapshot, String s) {
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+
+            }
+        });
 
     }
 }

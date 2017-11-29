@@ -164,6 +164,10 @@ public class MainActivity extends AppCompatActivity {
            // Intent startIntent = new Intent(MainActivity.this, Friends.class);
            // startActivity(startIntent);
         }
+        else if (item.getItemId() == R.id.action_allGroups) {
+             Intent startIntent = new Intent(MainActivity.this, AllGroups.class);
+             startActivity(startIntent);
+        }
         return true;
     }
 

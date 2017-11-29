@@ -4,7 +4,83 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
     tools:context="com.example.umairali.wyapp.CreatGroup">
+    <include layout="@layout/app_bar_layout"
+        android:id="@+id/creatGroup"></include>
 
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_below="@+id/creatGroup"
+        android:layout_height="wrap_content">
 
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="10dp">
+
+            <de.hdodenhof.circleimageview.CircleImageView
+                android:id="@+id/channel_image"
+                android:layout_width="150dp"
+                android:layout_height="150dp"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:src="@drawable/default_avatar" />
+
+            <Button
+                android:id="@+id/btn_upload"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="10dp"
+                android:background="@color/colorPrimary"
+                android:padding="10dp"
+                android:text="Upload"
+                android:textColor="@color/colorWhite"
+                android:textSize="14sp" />
+
+            <EditText
+                android:id="@+id/et_channelname"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_margin="3dp"
+                android:background="@drawable/edit_bg"
+                android:drawableEnd="@drawable/ic_pencil"
+                android:drawableRight="@drawable/ic_pencil"
+                android:gravity="left|center"
+                android:hint="Channel Name"
+                android:inputType="text"
+                android:padding="13dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="16sp" />
+
+            <EditText
+                android:id="@+id/tv_bio"
+                android:layout_width="match_parent"
+                android:layout_height="100dp"
+                android:layout_margin="3dp"
+                android:background="@drawable/edit_bg"
+                android:gravity="top|left|center"
+                android:hint="Description / Bio"
+                android:drawableEnd="@drawable/ic_pencil"
+                android:drawableRight="@drawable/ic_pencil"
+                android:inputType="textMultiLine"
+                android:padding="13dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:textSize="16sp" />
+            <Button
+                android:id="@+id/btn_createchannel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_margin="30dp"
+                android:background="@drawable/rounded_button1"
+                android:padding="10dp"
+                android:text="Create Group"
+                android:textColor="@color/colorWhite"
+                android:textSize="14sp" />
+        </LinearLayout>
+
+    </ScrollView>
 </RelativeLayout>

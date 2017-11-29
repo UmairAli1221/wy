@@ -9,4 +9,5 @@
     <color name="gray_text">#757575</color>
     <color name="item_row_start_color">#ffffff</color>
     <color name="item_row_end_color">#ffffff</color>
+    <color name="colorDivider">#BDBDBD</color>
 </resources>

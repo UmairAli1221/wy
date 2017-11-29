@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:emojicon="http://schemas.android.com/tools"
     android:orientation="vertical"
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/blogs_list_row_selector"
-    android:padding="10dp">
+    xmlns:emojicon="http://schemas.android.com/tools"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:weightSum="10">
+
 
     <!-- Thumbnail Image -->
     <LinearLayout
@@ -58,7 +58,7 @@
                         android:singleLine="false"
                         android:textSize="16dp"
                         emojicon:emojiconSize="24dp"
-                        android:textStyle="normal"
+                        android:textStyle="bold"
                         android:textColor="#2B3135"
                         android:background="@drawable/chat_left_item"
                         android:text="Example message"
@@ -78,21 +78,45 @@
         <LinearLayout
             android:orientation="horizontal"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:paddingLeft="52dp">
+            android:layout_height="match_parent">
 
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Name"
+                android:id="@+id/name"
+                android:layout_marginTop="5dp"
+                android:layout_marginLeft="5dp"
+                android:textColor="@color/colorPrimaryDark"
+                android:textStyle="bold"
+                android:fontFamily="sans-serif-light"
+                android:textSize="15dp"
+                android:singleLine="true" />
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="4m ago"
                 android:id="@+id/left_timeAgo"
                 android:layout_marginTop="5dp"
+                android:layout_marginLeft="32dp"
                 android:textColor="@color/gray_text"
+                android:fontFamily="sans-serif-light"
+                android:textSize="14dp"
+                android:singleLine="true" />
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Sent."
+                android:id="@+id/sentIndecator"
+                android:layout_marginTop="5dp"
+                android:textStyle="bold"
+                android:visibility="gone"
+                android:textColor="@color/colorPrimaryDark"
+                android:layout_marginLeft="20dp"
                 android:fontFamily="sans-serif-light"
                 android:textSize="14dp"
                 android:singleLine="true" />
         </LinearLayout>
     </LinearLayout>
-
 
 </LinearLayout>

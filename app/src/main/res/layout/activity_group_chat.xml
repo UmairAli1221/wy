@@ -1,0 +1,143 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:id="@+id/root_view"
+    xmlns:emojicon="http://schemas.android.com/apk/res-auto"
+    tools:context="com.example.umairali.wyapp.GroupChatActivity">
+    <LinearLayout
+        xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical"
+        android:background="@color/white">
+        <include
+            android:id="@+id/chat_app_bar"
+            layout="@layout/app_bar_layout" />
+        <LinearLayout
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:id="@+id/contentScreen">
+
+            <LinearLayout
+                android:layout_width="fill_parent"
+                android:layout_height="0dp"
+                android:layout_weight="1"
+                android:minHeight="200dip"
+                android:orientation="vertical">
+                <android.support.v4.widget.SwipeRefreshLayout
+                    android:id="@+id/message_layout_swip"
+                    android:layout_width="wrap_content"
+                    android:layout_height="match_parent"
+                    android:layout_above="@+id/bottomlayout"
+                    android:layout_below="@+id/chat_app_bar">
+
+                    <android.support.v7.widget.RecyclerView
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:divider="#ffffff"
+                        android:dividerHeight="0dp"
+                        android:id="@+id/listView" />
+                </android.support.v4.widget.SwipeRefreshLayout>
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:orientation="vertical"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:background="@drawable/chat_content_border">
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:paddingTop="5dp"
+                    android:paddingBottom="5dp"
+                    android:id="@+id/container_img">
+
+                    <ImageView
+                        android:layout_width="100dp"
+                        android:layout_height="100dp"
+                        android:id="@+id/previewImg"
+                        android:layout_marginLeft="55dp"
+                        android:background="@drawable/profile_default_cover"
+                        android:scaleType="centerCrop" />
+
+                    <ImageView
+                        android:layout_width="24dp"
+                        android:layout_height="24dp"
+                        android:id="@+id/deleteImg"
+                        android:layout_marginLeft="-24dp"
+                        android:background="@drawable/ic_clear_black_24dp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:orientation="horizontal"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent">
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:id="@+id/addImg"
+                            android:layout_marginLeft="8dp"
+                            android:layout_gravity="center"
+                            android:layout_marginRight="6dp"
+                            android:background="@drawable/ic_add_black_24dp" />
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:id="@+id/emojiBtn"
+                            android:layout_marginLeft="8dp"
+                            android:layout_gravity="center"
+                            android:layout_marginRight="6dp"
+                            android:background="@drawable/smiley" />
+                    </LinearLayout>
+
+                    <hani.momanii.supernova_emoji_library.Helper.EmojiconEditText
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:inputType="textMultiLine"
+                        android:id="@+id/messageText"
+                        android:hint="@string/placeholder_message"
+                        android:background="@android:color/transparent"
+                        android:layout_weight="1"
+                        android:minHeight="50dp"
+                        android:padding="10dp"
+                        android:textSize="16dp"
+                        emojicon:emojiconSize="24dp" />
+
+                    <LinearLayout
+                        android:orientation="horizontal"
+                        android:layout_width="wrap_content"
+                        android:layout_height="match_parent">
+
+                        <ImageView
+                            android:layout_width="32dp"
+                            android:layout_height="32dp"
+                            android:id="@+id/sendMessage"
+                            android:src="@drawable/ic_send_black_24dp"
+                            android:scaleType="centerCrop"
+                            android:layout_gravity="center"
+                            android:layout_marginRight="6dp"
+                            android:layout_marginLeft="8dp" />
+                    </LinearLayout>
+
+                </LinearLayout>
+
+            </LinearLayout>
+        </LinearLayout>
+    </LinearLayout>
+
+</LinearLayout>

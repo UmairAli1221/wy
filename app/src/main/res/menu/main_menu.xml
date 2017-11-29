@@ -6,6 +6,10 @@
         app:actionViewClass="android.support.v7.widget.SearchView"
         android:title="Search..."
         app:showAsAction="always"/>
+    <item android:id="@+id/action_allGroups"
+        android:title="All Groups"
+        android:icon="@drawable/ic_group_white_24dp"
+        app:showAsAction="always"/>
     <item android:title="Create a Group"
         android:id="@+id/newGroup"/>
     <item android:title="Settings"

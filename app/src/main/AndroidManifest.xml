@@ -21,13 +21,13 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <application
+        android:name=".OffilineCapability"
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/AppTheme"
-        android:name=".OffilineCapability">
+        android:theme="@style/AppTheme">
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
@@ -59,7 +59,10 @@
         <activity android:name=".CreatGroup" />
         <activity android:name=".Friends" />
         <activity android:name=".Profile" />
-        <activity android:name=".ChatActivity"></activity>
+        <activity android:name=".ChatActivity" />
+        <activity android:name=".AllGroups" />
+        <activity android:name=".GroupProfile" />
+        <activity android:name=".GroupChatActivity"></activity>
     </application>
 
 </manifest>
