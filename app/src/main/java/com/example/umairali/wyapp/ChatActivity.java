@@ -100,6 +100,7 @@ public class ChatActivity extends AppCompatActivity {
     private String mPrevKey = "";
     private StorageReference imageStorage;
     LinearLayout mContainerImg;
+    private String userName;
 
     ImageView mSendMessage, mAddImg, mEmojiBtn, mDeleteImg, mPreviewImg;
 
@@ -127,7 +128,7 @@ public class ChatActivity extends AppCompatActivity {
 
 
         mChatUser = getIntent().getStringExtra("user_id");
-        final String userName = getIntent().getStringExtra("user_name");
+        //final String userName = getIntent().getStringExtra("user_name");
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         View action_bar_view = inflater.inflate(R.layout.chat_custom_bar, null);
@@ -233,15 +234,17 @@ public class ChatActivity extends AppCompatActivity {
         mMessagesList.setAdapter(mAdapter);
 
 
-        mTitleView.setText(userName);
+
         mRootRef.child("Users").child(mChatUser).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
 
                 String online = dataSnapshot.child("online").getValue().toString();
                 String image = dataSnapshot.child("profile_image").getValue().toString();
-                // String name=dataSnapshot.child("name").getValue().toString();
-                // mTitleView.setText(name);
+                String name=dataSnapshot.child("name").getValue().toString();
+                mTitleView.setText(name);
+                userName=name;
+
 
                 if (online.equals("true")) {
 

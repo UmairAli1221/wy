@@ -28,6 +28,11 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+        <service android:name="FirebaseMessagingService">
+            <intent-filter>
+                <action android:name="com.google.firebase.MESSAGING_EVENT" />
+            </intent-filter>
+        </service>
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/google_maps_key" />
@@ -55,14 +60,40 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/. 
         -->
 
-        <activity android:name=".Settings" />
-        <activity android:name=".CreatGroup" />
-        <activity android:name=".Friends" />
-        <activity android:name=".Profile" />
-        <activity android:name=".ChatActivity" />
-        <activity android:name=".AllGroups" />
-        <activity android:name=".GroupProfile" />
-        <activity android:name=".GroupChatActivity"></activity>
+        <activity android:name=".Settings"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".CreatGroup"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".Friends"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".Profile"
+            android:parentActivityName=".MainActivity">
+            <intent-filter>
+                <action android:name="com.example.umairali.TARGET_FRIENDREQUEST" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".ChatActivity"
+            android:parentActivityName=".MainActivity">
+            <intent-filter>
+                <action android:name="com.example.umairali.TARGET_NOTIFICATION" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
+        <activity android:name=".AllGroups"
+            android:parentActivityName=".MainActivity"/>
+        <activity android:name=".GroupProfile"
+            android:parentActivityName=".AllGroups" />
+        <activity android:name=".GroupChatActivity"
+            android:parentActivityName=".MainActivity">
+            <intent-filter>
+                <action android:name="com.example.umairali.TARGET_GROUP" />
+
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>

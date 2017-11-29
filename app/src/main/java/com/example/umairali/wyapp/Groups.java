@@ -72,21 +72,7 @@ public class Groups extends Fragment {
         floatingActionButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                startActivity(new Intent(getActivity(), Groups.class));
-            }
-        });
-        mMyChannels.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                floatingActionButton.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
-
-                floatingActionButton.setVisibility(View.VISIBLE);
-
-                super.onScrollStateChanged(recyclerView, newState);
+                startActivity(new Intent(getActivity(), CreatGroup.class));
             }
         });
         return mychannels;
@@ -170,7 +156,7 @@ public class Groups extends Fragment {
 
         public void setStatus(String status) {
             TextView usersStatusView = (TextView) view.findViewById(R.id.messageTextView);
-            usersStatusView.setText(status + " memebrs");
+            usersStatusView.setText(status);
         }
 
         public void setImage(String image, final Context context) {

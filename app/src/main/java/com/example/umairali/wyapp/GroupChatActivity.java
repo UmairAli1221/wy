@@ -118,7 +118,6 @@ public class GroupChatActivity extends AppCompatActivity {
         mCurrentUserId = mAuth.getCurrentUser().getUid();
 
         mChatUser = getIntent().getStringExtra("user_id");
-        userName= getIntent().getStringExtra("Group_Name");
 
         mNotificationDatabase=FirebaseDatabase.getInstance().getReference().child("GroupNotifications");
         mMembersDatabase = FirebaseDatabase.getInstance().getReference().child("Group_Metadata").child(mChatUser).child("group_members");
@@ -235,6 +234,7 @@ public class GroupChatActivity extends AppCompatActivity {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 String groupName = dataSnapshot.child("Group_Name").getValue().toString();
+                userName=groupName;
                 mTitleView.setText(groupName);
                 String groupImage = dataSnapshot.child("Group_image").getValue().toString();
                 Picasso.with(GroupChatActivity.this).load(groupImage)
