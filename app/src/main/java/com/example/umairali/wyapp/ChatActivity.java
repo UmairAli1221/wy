@@ -125,9 +125,14 @@ public class ChatActivity extends AppCompatActivity {
         mUserRef = FirebaseDatabase.getInstance().getReference().child("Users").child(mAuth.getCurrentUser().getUid());
         mNotificationDatabase = FirebaseDatabase.getInstance().getReference().child("Notifications");
         imageStorage = FirebaseStorage.getInstance().getReference();
+        Intent intent = getIntent();
+        if (intent != null && intent.getExtras() != null) {
+            Bundle extras = intent.getExtras();
+            mChatUser= extras.getString("from_user_id");
+        }
+            mChatUser = getIntent().getStringExtra("user_id");
 
 
-        mChatUser = getIntent().getStringExtra("user_id");
         //final String userName = getIntent().getStringExtra("user_name");
 
         LayoutInflater inflater = (LayoutInflater) this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
@@ -621,7 +626,6 @@ public class ChatActivity extends AppCompatActivity {
             mprogressDialog.dismiss();
         }
     }
-
 
     @Override
     protected void onStop() {
