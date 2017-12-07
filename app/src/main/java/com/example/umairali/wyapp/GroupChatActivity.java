@@ -22,6 +22,8 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -542,5 +544,24 @@ public class GroupChatActivity extends AppCompatActivity {
             }
         });
 
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+
+            case R.id.action_settings:
+                Intent newIntent=new Intent(getApplicationContext(), GroupDetails.class);
+                newIntent.putExtra("user_id", mChatUser);
+                startActivity(newIntent);
+                break;
+
+        }
+        return super.onOptionsItemSelected(item);
     }
 }

@@ -95,8 +95,11 @@ public class Groups extends Fragment {
                     mRootRef.child("Group_Metadata").child(user_id).addValueEventListener(new ValueEventListener() {
                         @Override
                         public void onDataChange(DataSnapshot dataSnapshot) {
-                            final String groupName = dataSnapshot.child("Group_Name").getValue().toString();
-                            viewHolder.setName(groupName);
+                            final String groupName;
+                            if (dataSnapshot.hasChild("Group_Name")){
+                                 groupName= dataSnapshot.child("Group_Name").getValue().toString();
+                                viewHolder.setName(groupName);
+                            }
                             if (dataSnapshot.hasChild("Group_image")) {
                                 String groupImage = dataSnapshot.child("Group_image").getValue().toString();
                                 viewHolder.setImage(groupImage, getContext());
@@ -107,7 +110,8 @@ public class Groups extends Fragment {
                                 String lasttime = dataSnapshot.child("last_message_time").getValue().toString();
                                 long lastTime = Long.parseLong(lasttime);
                                 viewHolder.setTime(lastTime);
-                            }else {
+                            }
+                            if(dataSnapshot.hasChild("Group_Description")){
                                 String des = dataSnapshot.child("Group_Description").getValue().toString();
                                 viewHolder.setStatus(des);
                             }
@@ -116,7 +120,6 @@ public class Groups extends Fragment {
                                 public void onClick(View v) {
                                     Intent newIntent = new Intent(getContext(), GroupChatActivity.class);
                                     newIntent.putExtra("user_id", user_id);
-                                    newIntent.putExtra("Group_Name", groupName);
                                     startActivity(newIntent);
                                 }
                             });

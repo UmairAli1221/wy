@@ -2,17 +2,21 @@ package com.example.umairali.wyapp;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.widget.NestedScrollView;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.Button;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -32,11 +36,12 @@ public class GroupProfile extends AppCompatActivity {
     Bundle bundle;
     String from;
     TextView mDesc, mMember;
-    Button mJoinclan;
-    private DatabaseReference UsersDatabase, mRootRef, UserDatabase, mDatabase, mMembersDatabase,mBlockmembers;
+    Button mJoinclan, mDelete;
+    private DatabaseReference UsersDatabase, mRootRef, UserDatabase, mDatabase, mMembersDatabase, mBlockmembers;
     private FirebaseAuth mAuth;
     String mCurrentUser;
-    private String mGroupId, mGroupName;
+    private String mGroupId;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -45,12 +50,12 @@ public class GroupProfile extends AppCompatActivity {
         mDesc = (TextView) findViewById(R.id.tv_description);
         mMember = (TextView) findViewById(R.id.tv_member);
         mJoinclan = (Button) findViewById(R.id.btn_join);
+        mDelete = (Button) findViewById(R.id.btn_delete);
         mImage = (CircleImageView) findViewById(R.id.user_image);
 
 
         //----------------//
         mGroupId = getIntent().getStringExtra("user_id");
-        mGroupName = getIntent().getStringExtra("Group_Name");
 
         //Firebase References
         mAuth = FirebaseAuth.getInstance();
@@ -69,22 +74,27 @@ public class GroupProfile extends AppCompatActivity {
         mDatabase.child(mGroupId).addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                String groupDesc = dataSnapshot.child("Group_Description").getValue().toString();
-                String groupImage = dataSnapshot.child("Group_image").getValue().toString();
-                mDesc.setText("Description: " + groupDesc);
-                Picasso.with(getApplication()).load(groupImage)
-                        .placeholder(R.drawable.default_avatar).into(mImage, new Callback() {
-                    @Override
-                    public void onSuccess() {
+                if (dataSnapshot.hasChild("Group_Description")&&dataSnapshot.hasChild("Group_image")
+                        &&dataSnapshot.hasChild("CreatedBy_UserID")){
+                    String groupDesc = dataSnapshot.child("Group_Description").getValue().toString();
+                    String groupImage = dataSnapshot.child("Group_image").getValue().toString();
+                    String group_admin = dataSnapshot.child("CreatedBy_UserID").getValue().toString();
 
-                    }
+                    mDesc.setText("Description: " + groupDesc);
+                    Picasso.with(getApplication()).load(groupImage)
+                            .placeholder(R.drawable.default_avatar).into(mImage, new Callback() {
+                        @Override
+                        public void onSuccess() {
 
-                    @Override
-                    public void onError() {
-                        Picasso.with(getApplication()).load(R.drawable.default_avatar).into(mImage);
-                    }
-                });
+                        }
 
+                        @Override
+                        public void onError() {
+                            Picasso.with(getApplication()).load(R.drawable.default_avatar).into(mImage);
+                        }
+                    });
+
+                }
 
             }
 
@@ -93,6 +103,7 @@ public class GroupProfile extends AppCompatActivity {
 
             }
         });
+
         //rvmembers adaptor
         rvmembers = (RecyclerView) findViewById(R.id.rv_channel_mebers);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(getApplicationContext(), 1);
@@ -105,9 +116,9 @@ public class GroupProfile extends AppCompatActivity {
         UsersDatabase.addValueEventListener(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                if (dataSnapshot.hasChild(mGroupId)){
+                if (dataSnapshot.hasChild(mGroupId)) {
                     mJoinclan.setEnabled(false);
-                }else {
+                } else {
                     mJoinclan.setOnClickListener(new View.OnClickListener() {
                         @Override
                         public void onClick(View v) {
@@ -128,9 +139,9 @@ public class GroupProfile extends AppCompatActivity {
                                     mDatabase.child(mGroupId).addListenerForSingleValueEvent(new ValueEventListener() {
                                         @Override
                                         public void onDataChange(DataSnapshot dataSnapshot) {
-                                            String membersAdded =dataSnapshot.child("members").getValue().toString();
-                                            int members= Integer.parseInt(membersAdded);
-                                            members = members+1;
+                                            String membersAdded = dataSnapshot.child("members").getValue().toString();
+                                            int members = Integer.parseInt(membersAdded);
+                                            members = members + 1;
                                             mDatabase.child(mGroupId).child("members").setValue(String.valueOf(members));
                                         }
 
@@ -145,7 +156,6 @@ public class GroupProfile extends AppCompatActivity {
                             // mDatabase.child(mGroupId).child("members").setValue(members+1);
                             //String mmm= String.valueOf(members);
                             //Toast.makeText(Profile.this,""+members,Toast.LENGTH_LONG).show();
-
 
 
                         }
@@ -185,9 +195,9 @@ public class GroupProfile extends AppCompatActivity {
                             mDatabase.child(mGroupId).addValueEventListener(new ValueEventListener() {
                                 @Override
                                 public void onDataChange(DataSnapshot dataSnapshot) {
-                                    String group_admin=dataSnapshot.child("CreatedBy_UserID").getValue().toString();
-                                    if (group_admin.equals(user_id)){
-                                        TextView groupadmin=(TextView)viewHolder.view.findViewById(R.id.admin);
+                                    String group_admin = dataSnapshot.child("CreatedBy_UserID").getValue().toString();
+                                    if (group_admin.equals(user_id)) {
+                                        TextView groupadmin = (TextView) viewHolder.view.findViewById(R.id.admin);
                                         groupadmin.setVisibility(View.VISIBLE);
                                     }
                                 }
@@ -251,7 +261,7 @@ public class GroupProfile extends AppCompatActivity {
         }
 
         public void setAdmin() {
-            TextView groupadmin=(TextView)view.findViewById(R.id.admin);
+            TextView groupadmin = (TextView) view.findViewById(R.id.admin);
             groupadmin.setVisibility(View.VISIBLE);
         }
     }

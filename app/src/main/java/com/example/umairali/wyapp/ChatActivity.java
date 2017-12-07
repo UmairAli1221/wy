@@ -23,6 +23,8 @@ import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -640,4 +642,5 @@ public class ChatActivity extends AppCompatActivity {
         }
 
     }
+
 }
