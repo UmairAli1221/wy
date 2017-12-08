@@ -74,7 +74,7 @@ public class CreatGroup extends AppCompatActivity implements View.OnClickListene
         setContentView(R.layout.activity_creat_group);
         toolbar = (Toolbar) findViewById(R.id.creatGroup);
         setSupportActionBar(toolbar);
-        getSupportActionBar().setTitle("Creat Group");
+        getSupportActionBar().setTitle("Create Group");
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         //---------------//
@@ -102,7 +102,7 @@ public class CreatGroup extends AppCompatActivity implements View.OnClickListene
 
         /////////////////----------------------///////////////
         mprogressDialog = new ProgressDialog(this);
-        mprogressDialog.setMessage("Creating Chanel.....");
+        mprogressDialog.setMessage("Creating Channel.....");
         mprogressDialog.setCanceledOnTouchOutside(false);
 
 
